@@ -14,36 +14,4 @@ public class GatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
-
-    @Bean
-    public RouteLocator routeLocator(RouteLocatorBuilder builder) {
-        return builder.routes()
-                .route("service1_route", r -> r
-                        .path("/service1/**")
-                        .filters(f -> f
-                                .stripPrefix(1)
-                                .retry(config -> config
-                                        .setRetries(3)
-                                        // ИСПРАВЛЕНО: используем HttpMethod enum вместо String
-                                        .setMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
-                                )
-                        )
-                        .uri("http://api-service-1:8080")
-                )
-                .route("mock_route", r -> r
-                        .path("/mock/**")
-                        .filters(f -> f
-                                .stripPrefix(1)
-                        )
-                        .uri("http://wiremock:8080")
-                )
-                .route("fallback_route", r -> r
-                        .path("/**")
-                        .filters(f -> f
-                                .setStatus(HttpStatus.NOT_FOUND)
-                        )
-                        .uri("no://op")
-                )
-                .build();
-    }
 }
