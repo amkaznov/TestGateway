@@ -36,7 +36,9 @@ management:
         include: health,info,gateway
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always  # Лучше видеть детали при отладке
+      probes:
+        enabled: true
 
 logging:
   level:
