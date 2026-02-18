@@ -6,6 +6,7 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod; // ДОБАВЛЕНО
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -14,10 +15,6 @@ public class GatewayApplication {
         SpringApplication.run(GatewayApplication.class, args);
     }
 
-    /**
-     * Программная конфигурация маршрутов (альтернатива application.yml).
-     * Этот бин используется в дополнение к конфигурации в application.yml.
-     */
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -27,8 +24,8 @@ public class GatewayApplication {
                                 .stripPrefix(1)
                                 .retry(config -> config
                                         .setRetries(3)
-                                        .setMethods("GET", "POST", "PUT", "DELETE")
-                                        .setBackoff(100, 1.0, 0, false)
+                                        // ИСПРАВЛЕНО: используем HttpMethod enum вместо String
+                                        .setMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
                                 )
                         )
                         .uri("http://api-service-1:8080")
