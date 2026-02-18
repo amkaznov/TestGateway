@@ -1,22 +1,15 @@
 # Stage 1: Build stage
-FROM eclipse-temurin:17-jdk-alpine AS builder
+# Используем официальный образ Gradle, там уже всё настроено
+FROM gradle:8-jdk17 AS builder
 
 WORKDIR /app
 
-# Copy gradle wrapper and gradle configuration
-COPY gradle gradle
-COPY gradlew gradlew
-COPY gradle.properties gradle.properties
+# Копируем всё содержимое проекта (build.gradle, src и т.д.)
+# Gradle образ сам разберется, как собрать проект без внешнего wrapper
+COPY --chown=gradle:gradle . .
 
-# Copy build configuration
-COPY build.gradle build.gradle
-COPY settings.gradle settings.gradle
-
-# Copy source code
-COPY src src
-
-# Build the application
-RUN ./gradlew clean bootJar -x test
+# Собираем jar (используем установленный в системе gradle вместо ./gradlew)
+RUN gradle clean bootJar -x test
 
 # Stage 2: Runtime stage
 FROM eclipse-temurin:17-jre-alpine
