@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Route to Service 1 (используем имя сервиса из docker-compose)
+        - id: service1_route
+          uri: http://api-service-1:80
+          predicates:
+            - Path=/service1/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: service1CircuitBreaker
+                fallbackUri: forward:/service1-fallback
+
+        # Route to Mock (используем имя сервиса из docker-compose)
+        - id: mock_route
+          uri: http://wiremock:8080
+          predicates:
+            - Path=/mock/**
+          filters:
+            - StripPrefix=1
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    com.example.gateway: DEBUG

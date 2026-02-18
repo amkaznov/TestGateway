@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+.gradletasknamecache
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build
+out/
+target/
+*.class
+*.jar
+*.war
+*.zip
+
+# Environment
+.env
+.env.local
+*.log

@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        # Route to Service 1
+        - id: service1_route
+          uri: http://api-service-1:8080
+          predicates:
+            - Path=/service1/**
+          filters:
+            # Обрезка префикса /service1
+            - StripPrefix=1
+
+        # Route to Mock
+        - id: mock_route
+          uri: http://wiremock:8080
+          predicates:
+            - Path=/mock/**
+          filters:
+            # Обрезка префикса /mock
+            - StripPrefix=1
+
+      # Глобальные настройки
+      default-filters:
+        - name: RequestSize
+          args:
+            maxSize: 5242880 # 5MB
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - gateway-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    depends_on:
+      - api-service-1
+      - wiremock
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  api-service-1:
+    image: kennethreitz/httpbin:latest
+    container_name: api-service-1
+    ports:
+      - "8081:80"
+    networks:
+      - gateway-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/status/200"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  wiremock:
+    image: wiremock/wiremock:latest
+    container_name: wiremock
+    ports:
+      - "8082:8080"
+    networks:
+      - gateway-network
+    command:
+      - --bind-address=0.0.0.0
+      - --port=8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/__admin/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  gateway-network:
+    driver: bridge
