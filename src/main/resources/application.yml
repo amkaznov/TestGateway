@@ -5,29 +5,20 @@ spring:
   cloud:
     gateway:
       routes:
-        # Route to Service 1
         - id: service1_route
-          uri: http://api-service-1:8080
+          # Если есть переменная SERVICE1_URL — берем её, иначе дефолт
+          uri: ${SERVICE1_URL:http://api-service-1:8080} 
           predicates:
             - Path=/service1/**
           filters:
-            # Обрезка префикса /service1
             - StripPrefix=1
 
-        # Route to Mock
         - id: mock_route
-          uri: http://wiremock:8080
+          uri: ${WIREMOCK_URL:http://wiremock:8080}
           predicates:
             - Path=/mock/**
           filters:
-            # Обрезка префикса /mock
             - StripPrefix=1
-
-      # Глобальные настройки
-      default-filters:
-        - name: RequestSize
-          args:
-            maxSize: 5242880 # 5MB
 
 server:
   port: 8080
